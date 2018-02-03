@@ -36,9 +36,9 @@ public class MovieUrlJsoup implements Runnable{
 	private static final Logger LOG = LoggerFactory.getLogger(MovieUrlJsoup.class);
 	
 	//获取jedis对象
-	private volatile Jedis jedisIp = new JedisUtil("192.168.56.5", 6379).getJedis();
+	private Jedis jedisIp = new JedisUtil("192.168.56.5", 6379).getJedis();
 	
-	private volatile Jedis jedisUrl = new JedisUtil("192.168.56.3", 6379).getJedis();
+	private Jedis jedisUrl = new JedisUtil("192.168.56.3", 6379).getJedis();
 	
 	private volatile String movieUrl = "";
 	
@@ -73,10 +73,11 @@ public class MovieUrlJsoup implements Runnable{
 				IpProxy.store();
 				getIp();
 			} catch (IOException e) {
-				LOG.debug(e.getMessage(), new Exception());
+				LOG.debug(e.getMessage());
 			} catch (InterruptedException e) {
-				LOG.debug(e.getMessage(), new Exception());
+				LOG.debug(e.getMessage());
 			}
+			
 			
 			//遍历含有ip和端口的map集合,如果ip集合没有数据，不使用代理ip
 			for(Map.Entry<String, String> entry : ipMap.entrySet()) {
@@ -87,7 +88,7 @@ public class MovieUrlJsoup implements Runnable{
 					doc = Jsoup.connect(url).proxy(ip, port).timeout(3000).ignoreContentType(true).get();
 					return doc;
 				} catch(Exception e) {
-					LOG.debug(e.getMessage(), new Exception());
+					LOG.debug(e.getMessage());
 					//如果连接有异常，则移除ip集合和jedis中的ip和端口
 					ipMap.remove(ip, port);
 					jedisIp.del(ip);
@@ -103,7 +104,7 @@ public class MovieUrlJsoup implements Runnable{
 					doc = Jsoup.connect(url).proxy(ip, port).timeout(3000).ignoreContentType(true).get();
 					return doc;
 				} catch(Exception e) {
-					LOG.debug(e.getMessage(), new Exception());
+					LOG.debug(e.getMessage());
 					//如果连接有异常，则移除ip集合和jedis中的ip和端口
 					ipMap.remove(ip, port);
 					jedisIp.del(ip);
@@ -131,7 +132,7 @@ public class MovieUrlJsoup implements Runnable{
 			try {
 				Thread.sleep(4000);
 				eles = getDocument(url).select("body");
-				//			System.out.println(eles.toString());
+				//System.out.println(eles.toString());
 				String movieData = eles.get(0).text();
 				JSONObject obj = JSONObject.parseObject(movieData);
 				
@@ -144,28 +145,28 @@ public class MovieUrlJsoup implements Runnable{
 						movieUrl = obj.get("url").toString();
 						//输出使用当前线程名+电影url
 						System.out.println(Thread.currentThread().getName() + ":" + movieUrl);
-						if (movieUrl.startsWith("http")) {
-							jedisUrl.set(movieUrl, movieUrl);
-						}
+//						if (movieUrl.startsWith("http")) {
+//							jedisUrl.set(movieUrl, movieUrl);
+//						}
 					}
 				}
 				//移除使用过的url
-				if (jedisUrl.exists(movieUrl)) {
-					LinkQueue.removeVisitedUrl(url);
-				}
+//				if (jedisUrl.exists(movieUrl)) {
+//					LinkQueue.removeVisitedUrl(url);
+//				}
 				System.out.println("结束集合的大小："+ LinkQueue.getUnVisitedUrlNum());
 			}catch(Exception e) {
-				LOG.debug(e.getMessage(), new Exception());
+				LOG.debug(e.getMessage());
 			}
 		}
 	}
 	
 	public static void main(String[] args) {
 		MovieUrlJsoup movie = new MovieUrlJsoup();
-		ExecutorService executor = Executors.newFixedThreadPool(3);
+		ExecutorService executor = Executors.newFixedThreadPool(1);
 		executor.submit(movie);
-		executor.submit(movie);
-		executor.submit(movie);
+//		executor.submit(movie);
+//		executor.submit(movie);
 		executor.shutdown();
 	}
 }
