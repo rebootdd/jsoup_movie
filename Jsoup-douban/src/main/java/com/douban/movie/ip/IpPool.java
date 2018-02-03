@@ -68,7 +68,6 @@ public class IpPool {
 		jedis.del(key);
 	}
 	
-	
 	public static void main(String[] args) throws IOException {
 		IpPool ip  = new IpPool();
 		Address ad = new Address();
