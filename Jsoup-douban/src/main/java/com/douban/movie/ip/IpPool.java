@@ -1,8 +1,11 @@
 package com.douban.movie.ip;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +24,9 @@ public class IpPool {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(IpPool.class);
 
-	private static Jedis jedis = new JedisUtil("192.168.56.5", 6379).getJedis();
+	private static JedisUtil ju = new JedisUtil("192.168.56.5", 6379);
 		
-	private static Set<String> ips = jedis.keys("*");
-
+	private static Set<String> ips = new HashSet<>();
 
 	/**
 	 * 从redis中获取ip和端口
@@ -33,26 +35,38 @@ public class IpPool {
 	 * @throws IOException 
 	 */
 	public void initIps() throws IOException {
+		Jedis jedisIp = ju.getJedis();
+		ips = jedisIp.keys("*");
 		if (ips.isEmpty()) {
 			IpProxy.store();
-			ips = jedis.keys("*");
+			ips = jedisIp.keys("*");
+		}
+		if (jedisIp != null) {
+			jedisIp.close();
 		}
 	}
 	
 	/**
-	 * 获取ip和端口
-	 * @return
+	 * 获取访问地址
+	 * @return	访问地址
+	 * @throws JSONException 
 	 * @throws IOException
 	 */
-	public Address getIpAndPort() {
+	public Address getIpAndPort() throws JSONException {
 		try {
 			initIps();
 		}catch(Exception e) {
-			LOG.debug(e.getMessage());
+			LOG.debug("错误所在行：" + e.getStackTrace()[0].getLineNumber()
+					+ "; 错误信息：" + e.getMessage());
 		}
-		Address address = null;
+		Address address = new Address();
+		String ip = "";
+		int port = 0;
 		for(String key : ips) {
-			address = (Address)JSONArray.parse(key);
+			JSONObject obj = new JSONObject(key);
+			ip = obj.get("ip").toString();
+			port = Integer.parseInt(obj.get("port").toString());
+			address.setIp(ip);address.setPort(port);
 			return address;
 		}
 		return address;
@@ -63,17 +77,19 @@ public class IpPool {
 	 * @param address
 	 */
 	public void removeIpAndPort(Address address) {
+		Jedis jedisIp = ju.getJedis();
 		String key = JSONArray.toJSONString(address);
 		System.out.println(key);
-		jedis.del(key);
+		jedisIp.del(key);
 	}
 	
-	public static void main(String[] args) throws IOException {
-		IpPool ip  = new IpPool();
-		Address ad = new Address();
-		ad.setIp("110.87.236.153");
-		ad.setPort(8118);
-		ip.removeIpAndPort(ad);
-		System.out.println("完成");
-	}
+//	public static void main(String[] args) throws IOException, JSONException {
+//		IpPool ip  = new IpPool();
+//		Address ad = new Address();
+//		ad.setIp("110.87.236.153");
+//		ad.setPort(8118);
+//		ip.removeIpAndPort(ad);
+//		ip.getIpAndPort();
+//		System.out.println("完成");
+//	}
 }
