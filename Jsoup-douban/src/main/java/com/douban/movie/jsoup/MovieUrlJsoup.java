@@ -41,7 +41,6 @@ public class MovieUrlJsoup implements Runnable{
 	private volatile JedisUtil ju = new JedisUtil("192.168.56.3", 6379);
 	
 	private volatile String movieUrl = "";
-	
 	//获取文档操作对象
 	private volatile Document doc = null;
 	/**
@@ -51,7 +50,7 @@ public class MovieUrlJsoup implements Runnable{
 	 * @throws JSONException 
 	 * @throws IOException 
 	 */
-	public Document getDocument(String url) throws JSONException {
+	public synchronized Document getDocument(String url) throws JSONException {
 		//获取连接地址
 		Address address =  ipPool.getIpAndPort();
 		try {
@@ -83,9 +82,12 @@ public class MovieUrlJsoup implements Runnable{
 	 */
 	@Override
 	public void run() {
+		setUrlToRedis();
+	}
+	
+	public void setUrlToRedis() {
 		String url = "";
-		Elements eles = null;
-		
+		Elements eles = null;		
 		//获取jedis对象
 		Jedis jedisUrl = ju.getJedis();
 		//循环获取地址
@@ -112,10 +114,14 @@ public class MovieUrlJsoup implements Runnable{
 						System.out.println(Thread.currentThread().getName() + ":" + movieUrl);
 					}
 				}
+				
+				if(jedisUrl != null) {
+					jedisUrl.close();
+				}
 				//移除使用过的url
 				System.out.println("结束集合的大小："+ LinkQueue.getUnVisitedUrlNum());
 			}catch(Exception e) {
-//				e.printStackTrace();
+//						e.printStackTrace();
 				LOG.debug("错误所在行：" + e.getStackTrace()[0].getLineNumber()
 						+ "; 错误信息：" + e.getMessage());
 			}
@@ -124,10 +130,10 @@ public class MovieUrlJsoup implements Runnable{
 	
 	public static void main(String[] args) {
 		MovieUrlJsoup movie = new MovieUrlJsoup();
-		ExecutorService executor = Executors.newFixedThreadPool(2);
+		ExecutorService executor = Executors.newFixedThreadPool(3);
 		executor.submit(movie);
 		executor.submit(movie);
-//		executor.submit(movie);
+		executor.submit(movie);
 		executor.shutdown();
 	}
 }

@@ -26,14 +26,14 @@ public class LinkQueue {
 //			unVisitedUrl.addQueue("https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=电影&start=" + i);
 //		}
 		
-		for(int i = 0; i< 10000; i+=20) {
+		for(int i = 4760; i< 10000; i+=20) {
 			unVisitedUrl.addQueue("https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=电视剧&start=" + i);
 		}
 		
 		//将具体电影页面详情页网址添加到数据中
-		JedisUtil jedisUrl = new JedisUtil("192.168.56.3", 6379);
-		//获取jedis对象
-		Jedis jedis = jedisUrl.getJedis();
+//		JedisUtil jedisUrl = new JedisUtil("192.168.56.3", 6379);
+//		//获取jedis对象
+//		Jedis jedis = jedisUrl.getJedis();
 	}
 	
 	

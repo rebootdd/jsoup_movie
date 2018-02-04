@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.douban.movie.util.JedisUtil;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -81,6 +82,10 @@ public class IpPool {
 		String key = JSONArray.toJSONString(address);
 		System.out.println(key);
 		jedisIp.del(key);
+		
+		if(jedisIp != null) {
+			jedisIp.close();
+		}
 	}
 	
 //	public static void main(String[] args) throws IOException, JSONException {

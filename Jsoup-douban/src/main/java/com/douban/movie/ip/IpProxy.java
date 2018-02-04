@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.alibaba.fastjson.JSONArray;
+import com.douban.movie.util.JedisUtil;
 
 import redis.clients.jedis.Jedis;
 
@@ -22,6 +23,8 @@ import redis.clients.jedis.Jedis;
 public class IpProxy {
 	
 	private static Map<Address, Address> ipMap = new HashMap<>(16);
+	
+	private static JedisUtil ju = new JedisUtil("192.168.56.5", 6379);
 	
 	/**
 	 * 从网页上爬取ip地址和端口
@@ -52,7 +55,7 @@ public class IpProxy {
 		//获取网页的所有符合条件的ip和端口
 		go();
 		
-		Jedis jedis = new Jedis("192.168.56.5", 6379);
+		Jedis jedis = ju.getJedis();
 		
 		if (!ipMap.isEmpty()) {
 			String addressJson = null;
