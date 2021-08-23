@@ -24,7 +24,7 @@
 		<java.version>1.8</java.version>
 		
 		<!-- Jsoup-version -->
-		<jsoup.version>1.11.2</jsoup.version>
+		<jsoup.version>1.14.2</jsoup.version>
 		<!-- json-object change -->
 		<json-lib.version>2.4</json-lib.version>
 		<fastjson.version>1.2.31</fastjson.version>
