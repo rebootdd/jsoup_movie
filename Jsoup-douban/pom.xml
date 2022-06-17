@@ -27,7 +27,7 @@
 		<jsoup.version>1.11.2</jsoup.version>
 		<!-- json-object change -->
 		<json-lib.version>2.4</json-lib.version>
-		<fastjson.version>1.2.31</fastjson.version>
+		<fastjson.version>1.2.83</fastjson.version>
 		
 		<!-- zookeeper-version -->
 		<zookeeper.version>3.4.9</zookeeper.version>
