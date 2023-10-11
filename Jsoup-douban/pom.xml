@@ -30,7 +30,7 @@
 		<fastjson.version>1.2.31</fastjson.version>
 		
 		<!-- zookeeper-version -->
-		<zookeeper.version>3.4.9</zookeeper.version>
+		<zookeeper.version>3.7.2</zookeeper.version>
 	</properties>
 
 	<dependencies>
