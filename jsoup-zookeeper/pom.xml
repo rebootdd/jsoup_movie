@@ -24,7 +24,7 @@
 		<java.version>1.8</java.version>
 		
 		<!-- zookeeper-version -->
-		<zookeeper.version>3.4.9</zookeeper.version>
+		<zookeeper.version>3.7.2</zookeeper.version>
 	</properties>
 
 	<dependencies>
